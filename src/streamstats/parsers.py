@@ -3,7 +3,6 @@ import json
 import logging
 
 from pathlib import Path
-from streamstats.constants import EVENTS_PATH
 from streamstats.models import Event
 from streamstats.errors import InvalidEventError, InvalidTimestampError, CliConfigurationError
 
@@ -56,6 +55,3 @@ def parse_jsonl(path: Path, skip_invalid: bool = False):
     except OSError as e:
         raise CliConfigurationError(message=f"Нет прав на чтение файла {path} или путь неверный",
                                     error_code="permission_error") from e
-
-for event in parse_jsonl(EVENTS_PATH, skip_invalid=True):
-    print(event)
