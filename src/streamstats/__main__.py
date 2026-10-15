@@ -1,5 +1,5 @@
-from src.power import power_function
-from src.constants import SAMPLE_CONSTANT
+from streamstats import power_function
+from streamstats import SAMPLE_CONSTANT
 
 
 def main() -> None:
