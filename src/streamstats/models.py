@@ -1,8 +1,13 @@
 from dataclasses import dataclass
 from datetime import datetime, timezone
 
-from .constants import level_types
+from .constants import LEVEL_TYPES
 from .errors import InvalidEventError, InvalidTimestampError
+
+
+@dataclass
+class ParseStats:
+    skipped_invalid: int = 0
 
 
 @dataclass(frozen=True, slots=True)
@@ -35,7 +40,7 @@ class Event:
                                         error_code="invalid_timezone")
 
         # проверки level
-        if self.level not in level_types:
+        if self.level not in LEVEL_TYPES:
             raise InvalidEventError(message=f"Неподдерживаемый уровень: {self.level}",
                                          error_code="unsupported_level")
 
