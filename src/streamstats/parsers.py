@@ -3,7 +3,7 @@ import json
 import logging
 
 from pathlib import Path
-from streamstats.models import Event
+from streamstats.models import Event, ParseStats
 from streamstats.errors import InvalidEventError, InvalidTimestampError, CliConfigurationError
 
 logger = logging.getLogger(__name__)
@@ -31,7 +31,7 @@ def _parse_line(line: str) -> Event:
     return Event(timestamp, level, source, message)
 
 
-def parse_jsonl(path: Path, skip_invalid: bool = False):
+def parse_jsonl(path: Path, skip_invalid: bool = False, parse_stats: ParseStats | None = None):
     try:
         with open(path, 'r', encoding='utf-8') as file:
             for number, line in enumerate(file, start=1):
@@ -43,6 +43,8 @@ def parse_jsonl(path: Path, skip_invalid: bool = False):
 
                     if skip_invalid:
                         logger.warning("%s", e)
+                        if parse_stats is not None:
+                            parse_stats.skipped_invalid += 1
                         continue
                     else:
                         raise

@@ -6,6 +6,7 @@ from pathlib import Path
 from _pytest.logging import LogCaptureFixture
 
 from streamstats.errors import StreamStatsError, CliConfigurationError
+from streamstats.models import ParseStats
 from streamstats.parsers import parse_jsonl
 
 
@@ -61,9 +62,13 @@ def test_parse_skip_invalid(tmp_path: Path, caplog: LogCaptureFixture):
         '[1, 2, 3]\n',
         encoding='utf-8')
 
-    events = list(parse_jsonl(file, skip_invalid=True))
+    parse_stats = ParseStats()
+    events = list(parse_jsonl(file, skip_invalid=True, parse_stats=parse_stats))
+
     assert len(events) == 1
     assert 'строка 2' in caplog.text
+    assert parse_stats.skipped_invalid == 2
+
 
 
 def test_extra_key(tmp_path: Path):
