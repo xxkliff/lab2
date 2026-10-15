@@ -1,8 +1,17 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
 [project]
-name = "labs"
+name = "streamstats"
 version = "0.1.0"
-description = "Add your description here"
+description = "Потоковый анализатор файлов"
 requires-python = ">=3.12"
-dependencies = [
-    "pytest>=8.4.2",
-]
+dependencies = []
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-cov", "ruff", "mypy"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]

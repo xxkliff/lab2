@@ -5,6 +5,7 @@ repos:
       - id: mypy
         args: [--show-error-codes, --pretty]
         additional_dependencies:
+          - pytest
           - types-requests
           - types-PyYAML
 
