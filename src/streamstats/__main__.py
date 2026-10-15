@@ -1,20 +1,14 @@
-from streamstats import power_function
-from streamstats import SAMPLE_CONSTANT
 
+import logging
+
+logging.basicConfig(level=logging.WARNING, format="%(levelname)s: %(message)s")
 
 def main() -> None:
     """
     Обязательнная составляющая программ, которые сдаются. Является точкой входа в приложение
     :return: Данная функция ничего не возвращает
     """
-
-    target, degree = map(int, input("Введите два числа разделенные пробелом: ").split(" "))
-
-    result = power_function(target=target, power=degree)
-
-    print(result)
-
-    print(SAMPLE_CONSTANT)
+    pass
 
 if __name__ == "__main__":
     main()
