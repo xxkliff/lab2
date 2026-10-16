@@ -1,14 +1,15 @@
-
-import inspect
+import csv
 import json
 import logging
-import csv
-
 from functools import wraps
 from pathlib import Path
+
+from streamstats.errors import (
+    CliConfigurationError,
+    InvalidEventError,
+    InvalidTimestampError,
+)
 from streamstats.models import Event, ParseStats
-from streamstats.errors import InvalidEventError, InvalidTimestampError, CliConfigurationError
-from streamstats.constants import PROJECT_DIR
 
 logger = logging.getLogger(__name__)
 

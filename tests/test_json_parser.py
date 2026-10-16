@@ -1,11 +1,9 @@
-
-import pytest
-
 from pathlib import Path
 
+import pytest
 from _pytest.logging import LogCaptureFixture
 
-from streamstats.errors import StreamStatsError, CliConfigurationError
+from streamstats.errors import CliConfigurationError, StreamStatsError
 from streamstats.models import ParseStats
 from streamstats.parsers import parse_jsonl
 
@@ -86,7 +84,7 @@ def test_cyrillic(tmp_path: Path):
         '{"timestamp": "2026-10-01T08:00:00Z", "level": "INFO", "source": "тест1", "message": "тест2"}\n',
         encoding='utf-8')
 
-    event = list(parse_jsonl(file))[0]
+    event = next(iter(parse_jsonl(file)))
 
     assert event.source == 'тест1'
     assert event.message == 'тест2'
@@ -106,4 +104,3 @@ def test_parse_empty(tmp_path: Path):
     file.touch()
 
     assert list(parse_jsonl(file)) == []
-
