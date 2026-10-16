@@ -5,7 +5,7 @@ import pytest
 from pathlib import Path
 
 from streamstats.errors import StreamStatsError, CliConfigurationError
-from streamstats.models import ParseStats
+from streamstats.analysis import ParseStats
 from streamstats.parsers import parse_csv
 
 HEADER = "timestamp,level,source,message\n"

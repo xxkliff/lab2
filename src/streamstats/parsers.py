@@ -1,15 +1,15 @@
 import csv
 import json
 import logging
-from functools import wraps
 from pathlib import Path
 
 from streamstats.errors import (
-    CliConfigurationError,
     InvalidEventError,
     InvalidTimestampError,
 )
-from streamstats.models import Event, ParseStats
+from streamstats.models import Event
+from streamstats.analysis import ParseStats
+from streamstats.decorators import file_errors_generator
 
 logger = logging.getLogger(__name__)
 
@@ -50,24 +50,7 @@ def _build_event(raw: dict) -> Event:
     return Event(timestamp, level, source, message)
 
 
-def file_errors(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        path = args[0] if args else kwargs.get('path', 'путь не определён')
-
-        try:
-            yield from func(*args, **kwargs)
-        except FileNotFoundError as e:
-            raise CliConfigurationError(message=f"Файл {path} не найден", error_code="file_not_found") from e
-        except UnicodeDecodeError as e:
-            raise CliConfigurationError(message=f"Файл {path} не в кодировке UTF-8", error_code="invalid_encoding") from e
-        except OSError as e:
-            raise CliConfigurationError(message=f"Нет прав на чтение файла {path} или путь неверный",
-                                        error_code="permission_error") from e
-    return wrapper
-
-
-@file_errors
+@file_errors_generator
 def parse_jsonl(path: Path, skip_invalid: bool = False, parse_stats: ParseStats | None = None):
     with open(path, 'r', encoding='utf-8') as file:
         for number, line in enumerate(file, start=1):
@@ -80,7 +63,7 @@ def parse_jsonl(path: Path, skip_invalid: bool = False, parse_stats: ParseStats 
             yield event
 
 
-@file_errors
+@file_errors_generator
 def parse_csv(path: Path, skip_invalid: bool = False, parse_stats: ParseStats | None = None):
     with open(path, 'r', newline='', encoding='utf-8') as file:
         reader = csv.DictReader(file)

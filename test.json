@@ -1,0 +1,18 @@
+{
+    "total_events": 1,
+    "by_level": {
+        "ERROR": 1
+    },
+    "by_source": {
+        "streamstats": 1
+    },
+    "top_error_sources": [
+        {
+            "source": "streamstats",
+            "count": 1
+        }
+    ],
+    "first_timestamp": "2026-10-01T08:00:00+00:00",
+    "last_timestamp": "2026-10-01T08:00:00+00:00",
+    "skipped_invalid": 1
+}

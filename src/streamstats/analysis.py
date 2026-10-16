@@ -8,6 +8,11 @@ from streamstats.models import Event
 
 
 @dataclass
+class ParseStats:
+    skipped_invalid: int = 0
+
+
+@dataclass
 class Analysis:
     total_events: int = 0
     levels: Counter[str] = field(default_factory=Counter)
