@@ -1,6 +1,7 @@
 
 from pathlib import Path
 
+
 class StreamStatsError(Exception):
     def __init__(self, error_code, message, path: Path | str = "", line: int | None = None):
         super().__init__(message)
@@ -10,8 +11,11 @@ class StreamStatsError(Exception):
         self.error_code = error_code
 
     def __str__(self):
-        if self.path is not None and self.line is not None:
-            return f"{self.path} строка {self.line}: {self.message}"
+        if self.path is not None:
+            self.message = f"(путь {self.path}): " + self.message
+        if self.line is not None:
+            self.message = f"(строка {self.line}) " + self.message
+
         return self.message
 
 

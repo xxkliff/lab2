@@ -1,11 +1,8 @@
 import json
 from pathlib import Path
 
-from streamstats.analysis import Analysis, ParseStats, analyze
-from streamstats.models import Event
+from streamstats.analysis import Analysis, ParseStats
 from streamstats.decorators import file_errors
-from streamstats.constants import PROJECT_DIR
-
 
 
 @file_errors
