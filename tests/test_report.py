@@ -3,11 +3,10 @@ from pathlib import Path
 
 import pytest
 
-from streamstats.errors import CliConfigurationError
 from streamstats.analysis import Analysis, ParseStats, analyze
+from streamstats.errors import CliConfigurationError
 from streamstats.models import Event
 from streamstats.report import build_report, save_report
-
 
 EMPTY_REPORT = {
         "total_events": 0,
@@ -25,8 +24,8 @@ EVENTS = [
     Event("2026-10-01T12:00:00Z", "DEBUG", "cache", ""),
     Event("2026-10-01T09:00:00Z", "ERROR", "db", ""),
     Event("2026-10-01T09:05:00Z", "ERROR", "db", "test"),
-    Event("2026-10-01T09:10:00Z", "CRITICAL", "payments", "test"),
-    Event("2026-10-01T09:11:00Z", "ERROR", "payments", "test"),
+    Event("2026-10-01T09:10:00Z", "CRITICAL", "тест, тест", "test"),
+    Event("2026-10-01T09:11:00Z", "ERROR", "тест, тест", "test"),
     Event("2026-10-01T09:20:00Z", "ERROR", "api", "тест, тест"),
     Event("2026-10-01T09:21:00Z", "ERROR", "api", "502"),
     Event("2026-10-01T09:30:00Z", "CRITICAL", "cache", "test"),
@@ -37,23 +36,29 @@ EVENTS = [
 ]
 
 
-def test_report():
-    report = build_report(analyze(EVENTS), ParseStats())
+def test_report_and_cyrillic():
+    report = build_report(analyze(EVENTS), ParseStats(), top_n=5)
 
     assert report == {
         "total_events": 14,
         "by_level": {"INFO": 1, "ERROR": 8, "DEBUG": 1, "CRITICAL": 3, "WARNING": 1},
-        "by_source": {"auth": 2, "db": 3, "cache": 2, "payments": 2, "api": 2, "queue": 1, "test": 2},
+        "by_source": {"auth": 2, "db": 3, "cache": 2, "тест, тест": 2, "api": 2, "queue": 1, "test": 2},
         "top_error_sources": [ {"source": "db", "count": 3},
                                {"source": "api", "count": 2},
-                               {"source": "payments", "count": 2},
                                {"source": "test", "count": 2},
+                               {"source": "тест, тест", "count": 2},
                                {"source": "cache", "count": 1},
         ],
         "first_timestamp": "2026-10-01T08:00:00+03:00",
         "last_timestamp": "2026-10-01T12:00:00+00:00",
         "skipped_invalid": 0,
     }
+
+
+def test_top_n():
+    report = build_report(analyze(EVENTS), ParseStats(), top_n=3)
+
+    assert len(report["top_error_sources"]) == 3
 
 
 def test_report_skipped_invalid():

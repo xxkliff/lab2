@@ -9,8 +9,10 @@ def build_report(analysis: Analysis, parse_stats: ParseStats, top_n: int = 5) ->
     first_timestamp = None
     last_timestamp = None
 
-    if analysis.first_timestamp is not None: first_timestamp = analysis.first_timestamp.isoformat()
-    if analysis.last_timestamp is not None: last_timestamp = analysis.last_timestamp.isoformat()
+    if analysis.first_timestamp is not None:
+        first_timestamp = analysis.first_timestamp.isoformat()
+    if analysis.last_timestamp is not None:
+        last_timestamp = analysis.last_timestamp.isoformat()
 
     return {
         "total_events": analysis.total_events,
