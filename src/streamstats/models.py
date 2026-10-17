@@ -5,11 +5,6 @@ from .constants import LEVEL_TYPES
 from .errors import InvalidEventError, InvalidTimestampError
 
 
-@dataclass
-class ParseStats:
-    skipped_invalid: int = 0
-
-
 @dataclass(frozen=True, slots=True)
 class Event:
     timestamp: str | datetime

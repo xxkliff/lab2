@@ -4,7 +4,7 @@ import pytest
 from _pytest.logging import LogCaptureFixture
 
 from streamstats.errors import CliConfigurationError, StreamStatsError
-from streamstats.models import ParseStats
+from streamstats.analysis import ParseStats
 from streamstats.parsers import parse_jsonl
 
 
