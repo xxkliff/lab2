@@ -7,7 +7,10 @@ from streamstats.errors import CliConfigurationError
 
 
 def handle_file_exception(e: Exception, path: Path | str):
-    if isinstance(e, FileNotFoundError):
+    if not Path(path).resolve().parent.exists():
+        raise CliConfigurationError(message="Директории не существует", error_code="directory_not_found",
+                                    path=Path(path).parent.resolve()) from e
+    elif isinstance(e, FileNotFoundError):
         raise CliConfigurationError(message="Файл не найден", error_code="file_not_found", path=path) from e
     elif isinstance(e, UnicodeDecodeError):
         raise CliConfigurationError(message="Файл не в кодировке UTF-8", error_code="invalid_encoding", path=path) from e
