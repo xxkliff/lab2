@@ -11,12 +11,14 @@ class StreamStatsError(Exception):
         self.error_code = error_code
 
     def __str__(self):
-        if self.path is not None:
-            self.message = f"(путь {self.path}): " + self.message
-        if self.line is not None:
-            self.message = f"(строка {self.line}) " + self.message
+        parts = []
 
-        return self.message
+        if self.line is not None:
+            parts.append(f"(строка {self.line})")
+        if self.path:
+            parts.append(f"(путь {self.path})")
+        parts.append(self.message)
+        return " ".join(parts)
 
 
 class UnsupportedFormatError(StreamStatsError):

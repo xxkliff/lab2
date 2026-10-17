@@ -3,13 +3,13 @@ import json
 import logging
 from pathlib import Path
 
+from streamstats.analysis import ParseStats
+from streamstats.decorators import file_errors_generator
 from streamstats.errors import (
     InvalidEventError,
     InvalidTimestampError,
 )
 from streamstats.models import Event
-from streamstats.analysis import ParseStats
-from streamstats.decorators import file_errors_generator
 
 logger = logging.getLogger(__name__)
 

@@ -6,17 +6,17 @@ from streamstats.decorators import file_errors
 
 
 @file_errors
-def save_report(analise: Analysis, parse_stats: ParseStats, path: Path, top_error_sources_count: int = 5):
+def save_report(analyse: Analysis, parse_stats: ParseStats, path: Path, top_error_sources_count: int = 5):
     top_error_sources = [{"source": source[0], "count": source[1]}
-                         for source in analise.top_error_sources(n=top_error_sources_count)]
+                         for source in analyse.top_error_sources(n=top_error_sources_count)]
 
     report = {
-        "total_events":  analise.total_events,
-        "by_level": dict(analise.levels),
-        "by_source": dict(analise.sources),
+        "total_events":  analyse.total_events,
+        "by_level": dict(analyse.levels),
+        "by_source": dict(analyse.sources),
         "top_error_sources": top_error_sources,
-        "first_timestamp": analise.first_timestamp.isoformat(),
-        "last_timestamp": analise.last_timestamp.isoformat(),
+        "first_timestamp": analyse.first_timestamp.isoformat(),
+        "last_timestamp": analyse.last_timestamp.isoformat(),
         "skipped_invalid": parse_stats.skipped_invalid,
     }
 
