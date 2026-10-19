@@ -1,0 +1,6 @@
+{"timestamp": "2026-10-01T08:00:00Z", "level": "INFO", "source": "auth", "message": "user logged"}
+{"timestamp": "2026-10-01T08:00:05Z", "level": "ERROR", "source": "db", "message": "timeout"}
+{"timestamp": "2026-10-01T08:01:10+03:00", "level": "WARNING", "source": "auth", "message": "test"}
+{"timestamp": "2026-10-01T08:02:00.250Z", "level": "ERROR", "source": "db", "message": "failed"}
+{"timestamp": "2026-10-01T08:03:30Z", "level": "CRITICAL", "source": "payments", "message": "test"}
+{"timestamp": "2026-10-01T08:04:00Z", "level": "DEBUG", "source": "cache", "message": "", "host": "hello"}
