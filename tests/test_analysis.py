@@ -1,8 +1,8 @@
 
 import pytest
 
-from streamstats.models import Event
 from streamstats.analysis import analyze
+from streamstats.models import Event
 
 
 def make_event(level: str = "INFO",
