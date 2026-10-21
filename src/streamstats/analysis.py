@@ -2,6 +2,7 @@ from collections import Counter
 from collections.abc import Iterable
 from dataclasses import dataclass, field
 from datetime import datetime
+from typing import cast
 
 from streamstats.constants import ERROR_LEVELS
 from streamstats.models import Event
@@ -25,15 +26,16 @@ class Analysis:
         self.total_events += 1
         self.levels[event.level] += 1
         self.sources[event.source] += 1
+        timestamp = cast(datetime, event.timestamp)
 
         if event.level in ERROR_LEVELS:
             self.error_sources[event.source] += 1
 
-        if self.first_timestamp is None or event.timestamp < self.first_timestamp:
-            self.first_timestamp = event.timestamp
+        if self.first_timestamp is None or timestamp < self.first_timestamp:
+            self.first_timestamp = timestamp
 
-        if self.last_timestamp is None or event.timestamp > self.last_timestamp:
-            self.last_timestamp = event.timestamp
+        if self.last_timestamp is None or timestamp > self.last_timestamp:
+            self.last_timestamp = timestamp
 
     def top_error_sources(self, n: int = 5) -> list[tuple[str, int]]:
         return sorted(self.error_sources.items(), key=lambda item: (-item[1], item[0]))[:n]

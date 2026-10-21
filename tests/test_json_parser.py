@@ -3,8 +3,8 @@ from pathlib import Path
 import pytest
 from _pytest.logging import LogCaptureFixture
 
-from streamstats.errors import CliConfigurationError, StreamStatsError
 from streamstats.analysis import ParseStats
+from streamstats.errors import CliConfigurationError, StreamStatsError
 from streamstats.parsers import parse_jsonl
 
 

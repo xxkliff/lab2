@@ -18,11 +18,11 @@ def _parse_line(line: str) -> Event:
         json_line = json.loads(line)
     except json.JSONDecodeError as e:
         raise InvalidEventError(
-            message=f"JSON объект не читается.",
+            message="JSON объект не читается.",
             error_code="json_decode_error") from e
 
     if not isinstance(json_line, dict):
-        raise InvalidEventError(message=f"Объект не dict.", error_code="invalid_object")
+        raise InvalidEventError(message="Объект не dict.", error_code="invalid_object")
 
     return _build_event(json_line)
 
@@ -81,10 +81,10 @@ def parse_csv(path: Path, skip_invalid: bool = False, parse_stats: ParseStats | 
         for row in reader:
             try:
                 if None in row:
-                    raise InvalidEventError(message=f"лишние значения в строке", error_code="extra_value",
+                    raise InvalidEventError(message="лишние значения в строке", error_code="extra_value",
                                             path=path, line=reader.line_num)
                 if None in row.values():
-                    raise InvalidEventError(message=f"не хватает значений в строке", error_code="value_missing",
+                    raise InvalidEventError(message="не хватает значений в строке", error_code="value_missing",
                                             path=path, line=reader.line_num)
 
                 event = _build_event(row)

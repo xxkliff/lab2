@@ -5,7 +5,11 @@ import sys
 from pathlib import Path
 
 from streamstats.analysis import ParseStats, analyze
-from streamstats.errors import CliConfigurationError, StreamStatsError, UnsupportedFormatError
+from streamstats.errors import (
+    CliConfigurationError,
+    StreamStatsError,
+    UnsupportedFormatError,
+)
 from streamstats.parsers import parse_csv, parse_jsonl
 from streamstats.report import build_report, save_report
 

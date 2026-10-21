@@ -1,10 +1,15 @@
-from dataclasses import FrozenInstanceError
 from datetime import datetime
+from typing import Any
 
 import pytest
 
-from streamstats.errors import StreamStatsError, InvalidTimestampError, InvalidEventError
+from streamstats.errors import (
+    InvalidEventError,
+    InvalidTimestampError,
+    StreamStatsError,
+)
 from streamstats.models import Event
+
 
 @pytest.mark.parametrize(
     ("timestamp", "level", "source", "message"),
@@ -23,8 +28,8 @@ def test_positive_model(timestamp: str, level: str, source: str, message: str):
     assert event.level == level
     assert event.source == source
     assert event.timestamp == datetime.fromisoformat(timestamp)
-    assert event.timestamp.tzinfo is not None
     assert isinstance(event.timestamp, datetime)
+    assert event.timestamp.tzinfo is not None
 
 
 @pytest.mark.parametrize(
@@ -45,8 +50,8 @@ def test_positive_model(timestamp: str, level: str, source: str, message: str):
         ("2026-10-01T08:00:00Z", "INFO", "test", None, InvalidEventError, "invalid_type"),
     ],
 )
-def test_negative_model(timestamp: object, level: object, source: str, message: str,
-                        error_class: object, error_code: str):
+def test_negative_model(timestamp: Any, level: Any, source: Any, message: Any,
+                        error_class: Any, error_code: Any):
     with pytest.raises(StreamStatsError) as exc_info:
         Event(timestamp, level, source, message)
     assert exc_info.value.error_code == error_code

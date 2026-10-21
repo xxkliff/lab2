@@ -1,5 +1,4 @@
-
-import pytest
+from datetime import UTC, datetime
 
 from streamstats.analysis import analyze
 from streamstats.models import Event
@@ -67,9 +66,6 @@ def test_errors():
     assert analysis.top_error_sources(n=3) == [("db", 3), ("login", 1), ("qqq", 1)]
 
 
-from datetime import datetime, timezone
-
-
 def test_min_max_timestamp():
     events = [
         make_event(ts="2026-10-01T06:00:00Z"),  # Раньше
@@ -78,5 +74,5 @@ def test_min_max_timestamp():
 
     analysis = analyze(events)
 
-    assert analysis.first_timestamp == datetime(2026, 10, 1, 6, 0, tzinfo=timezone.utc)
-    assert analysis.last_timestamp == datetime(2026, 10, 1, 9, 0, tzinfo=timezone.utc)
+    assert analysis.first_timestamp == datetime(2026, 10, 1, 6, 0, tzinfo=UTC)
+    assert analysis.last_timestamp == datetime(2026, 10, 1, 9, 0, tzinfo=UTC)

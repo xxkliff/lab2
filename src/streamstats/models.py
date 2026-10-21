@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime
 
 from .constants import LEVEL_TYPES
 from .errors import InvalidEventError, InvalidTimestampError
