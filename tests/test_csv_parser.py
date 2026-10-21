@@ -1,11 +1,10 @@
 import logging
+from pathlib import Path
 
 import pytest
 
-from pathlib import Path
-
-from streamstats.errors import StreamStatsError, CliConfigurationError
 from streamstats.analysis import ParseStats
+from streamstats.errors import CliConfigurationError, StreamStatsError
 from streamstats.parsers import parse_csv
 
 HEADER = "timestamp,level,source,message\n"
@@ -114,7 +113,7 @@ def test_extra_column(tmp_path: Path):
 def test_cyrillic(tmp_path: Path):
     file = write_csv(tmp_path, HEADER,"2026-10-01T08:00:00Z,INFO,тест1,тест2\n")
 
-    event = list(parse_csv(file))[0]
+    event = next(iter(parse_csv(file)))
 
     assert event.source == "тест1"
     assert event.message == "тест2"
@@ -138,7 +137,7 @@ def test_parse_empty(tmp_path: Path):
 
 def test_comma(tmp_path: Path):
     file = write_csv(tmp_path, HEADER, '2026-10-01T08:00:00Z,INFO,auth,"слабый пароль, повторите"\n')
-    event = list(parse_csv(file))[0]
+    event = next(iter(parse_csv(file)))
 
     assert event.source == "auth"
     assert event.message == "слабый пароль, повторите"

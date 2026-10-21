@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime
 
 from .constants import LEVEL_TYPES
 from .errors import InvalidEventError, InvalidTimestampError
@@ -7,12 +7,26 @@ from .errors import InvalidEventError, InvalidTimestampError
 
 @dataclass(frozen=True, slots=True)
 class Event:
+    """
+    Одно событие из входного файла
+
+    timestamp - ISO 8601 с часовым поясом, после создания всегда datetime
+    level - один из LEVEL_TYPES
+    source - непустая строка
+    message - строка, может быть пустой
+    """
     timestamp: str | datetime
     level: str
     source: str
     message: str
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
+        """
+        Проверяет поля Event'а и переводит timestamp из строки в datetime
+
+        :raises InvalidEventError: неверный тип поля, неизвестный уровень, пустой source
+        :raises InvalidTimestampError: timestamp не в формате ISO 8601 или без часового пояса
+        """
         only_str = {"level": self.level, "source": self.source, "message": self.message}
 
         # только строковые поля

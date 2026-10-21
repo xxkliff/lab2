@@ -2,25 +2,50 @@ import argparse
 import json
 import logging
 import sys
+from collections.abc import Callable, Iterator
 from pathlib import Path
 
 from streamstats.analysis import ParseStats, analyze
-from streamstats.errors import CliConfigurationError, StreamStatsError, UnsupportedFormatError
+from streamstats.errors import (
+    CliConfigurationError,
+    StreamStatsError,
+    UnsupportedFormatError,
+)
+from streamstats.models import Event
 from streamstats.parsers import parse_csv, parse_jsonl
 from streamstats.report import build_report, save_report
 
-PARSERS = {
+PARSERS: dict[str, Callable] = {
     "csv": parse_csv,
     "jsonl": parse_jsonl,
 }
 
 
-def _all_events(args, parser, parse_stats):
+def _all_events(args: argparse.Namespace, parser: Callable, parse_stats: ParseStats) -> Iterator[Event]:
+    """
+    Последовательно читает все входные файлы
+
+    :param args: аргументы команды analyze, используются inputs и skip_invalid
+    :param parser: функция-парсер для выбранного формата из PARSERS
+    :param parse_stats: общая статистика пропущенных строк для всех файлов
+    :return: генератор событий Event из всех файлов по очереди
+    """
     for path in args.inputs:
         yield from parser(path, args.skip_invalid, parse_stats)
 
 
-def _analyze_func(args):
+def _analyze_func(args: argparse.Namespace) -> None:
+    """
+    Выполняет команду analyze: проверяет аргументы, считает статистику и выводит отчёт
+
+    Если --output не указан, отчёт печатается в stdout
+
+    :param args: аргументы команды analyze
+    :raises UnsupportedFormatError: формат не поддерживается
+    :raises CliConfigurationError: файл отчёта совпадает с входным
+    :raises InvalidEventError: невалидная строка без --skip-invalid
+    :raises InvalidTimestampError: невалидный timestamp без --skip-invalid
+    """
     parser = PARSERS.get(args.format)
     if parser is None:
         raise UnsupportedFormatError(message=f"Неподдерживаемый формат: {args.format}",
@@ -43,7 +68,15 @@ def _analyze_func(args):
         save_report(report, args.output)
 
 
-def main(argv=None):
+def main(argv: list[str] | None = None) -> int:
+    """
+    CLI, разбирает аргументы и запускает выбранную команду
+
+    Ошибки StreamStatsError выводятся в stderr. Остальные ошибки, не перехватываются
+
+    :param argv: аргументы команды. Если None - берутся из командной строки
+    :return: 0 при успехе, 2 при ошибке
+    """
     logging.basicConfig(level=logging.WARNING, format="%(levelname)s: %(message)s")
 
     parser = argparse.ArgumentParser(

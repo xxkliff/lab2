@@ -1,63 +1,150 @@
-# Шаблон репозитория, для успешной сдачи лабораторных работ.
 
-## Введение
-Данный шаблон является примером оформления кода для сдачи лабораторных работ.
-Рекомендуется  строго его придерживаться во избежания проблем при сдаче и понижения баллов
+# Лабораторная работа 2. Потоковый анализатор файлов
 
+Козинов Степан Андреевич, М8О-102БВ-26
+
+## Возможности
+
+- **`analyze`** - читает ивенты из файлов формата CSV и JSONL построчно и пишет отчёт в JSON
+
+## Установка
+
+Нужен Python 3.12 или новее
+
+**Windows (PowerShell)**
+```powershell
+py -3.14 -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+pip install -e .
+```
+
+**Linux / macOS**
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+pip install -e .
+```
+
+## Тесты и проверки
+
+```bash
+python -m pytest
+ruff check .
+mypy src tests
+python -m streamstats --help
+pre-commit run --all-files
+```
+
+68 тестов, покрытие streamstats > 93%
+
+## Использование
+
+```bash
+python -m streamstats --help
+python -m streamstats analyze INPUT [INPUT ...] --format csv|jsonl --output REPORT.json
+python -m streamstats analyze INPUT --format jsonl --skip-invalid
+```
+
+Все входные файлы должны быть одного формата. Если `--output` не указан, отчёт выводится в stdout
+
+### События
+
+Каждая строка файла преобразуется в объект `Event`:
+
+```text
+timestamp: ISO 8601 с часовым поясом
+level:     DEBUG | INFO | WARNING | ERROR | CRITICAL
+source:    непустая строка
+message:   строка (может быть пустой)
+```
+
+### Примеры
+`python -m streamstats analyze examples/events.jsonl --format jsonl`
+```text
+{
+    "total_events": 6,
+    "by_level": {
+        "INFO": 1,
+        "ERROR": 2,
+        "WARNING": 1,
+        "CRITICAL": 1,
+        "DEBUG": 1
+    },
+    "by_source": {
+        "auth": 2,
+        "db": 2,
+        "payments": 1,
+        "cache": 1
+    },
+    "top_error_sources": [
+        {
+            "source": "db",
+            "count": 2
+        },
+        {
+            "source": "payments",
+            "count": 1
+        }
+    ],
+    "first_timestamp": "2026-10-01T08:01:10+03:00",
+    "last_timestamp": "2026-10-01T08:04:00+00:00",
+    "skipped_invalid": 0
+}
+```
+
+`python -m streamstats analyze bad.jsonl --format jsonl --output report.json`
+
+Ошибка: (строка 3) (путь bad.jsonl) JSON объект не читается.
+
+Коды возврата: `0` успех, `2` ошибка входных данных или CLI
 
 ## Структура проекта
 
- <pre>
-    .
-    ├── lab<# лабораторной работы>             # Кодовая база вашей лабораторной работы
-    │   ├── src/                               # Исходный код
-    │   ├── tests/                             # Unit тесты
-    │   ├── uv.lock                            # зависимости вашего проекта
-    │   ├── report.pdf                         # Отчет
-    │   ├── .gitignore                         # git ignore файл
-    │   ├──.pre-commit-config.yaml             # Средства автоматизации проверки кодстайла
-    │   ├── README.md                          # Описание вашего проекта, с описанием файлов и с титульником о том,
-                                               # что и какая задача
-</pre>
-
-В папке [src](./src) лежат файлы с реализацией задачи заданной в лабораторной работе. Обязательным файлом является файл
-[main.py](src/streamstats/__main__.py) в котором описана точка входа в приложение - функция **main**. Требования к коду:
-- Переменные, функции и модули именуются по [**snake_case**](https://realpython.com/ref/glossary/snake-case/)
-- Константы должны быть вынесены в файл **constants.py** и именовановаться с помощию символов в верхнем регистре
-- Классы должны именоваться в [**PascalCase**](https://habr.com/ru/articles/724556/)
-- Имена сущностей должны быть осмысленные и содержательные
-- Все отступы должны быть консистентны: 1 TAB = 4 spaces
-- Весь функционал должен быть описан в функциях и в классах. Не допускается писать весь в глобальном скоупе или в одной функции
-- К каждой функции должны быть описаны  [**docstring**](https://peps.python.org/pep-0257/) и аннотации к аргументам и выходным параметрам функций.
-
-В качестве референса проще cходу соблюдать [**PEP8**](https://peps.python.org/pep-0008/) и использовать IDE c готовой поддержкой:
-например PyCharm или VSCode c настроенными плагинами.
-В ходе попыток запушить код в репозиторий ваш код будет проходить проверку статическим анализатором [**mypy**](https://mypy-lang.org/)
-а также с встроенным в [**ruff**](https://astral.sh/ruff) на предмет нарушения код стайла. При работе с кодовой базой
-всю работу необходимо выполнять в [виртуальном окружении](https://docs.python.org/3/tutorial/venv.html)
-
-
-В папке [tests](./tests) лежат [unit тесты](https://tproger.ru/articles/testiruem-na-python-unittest-i-pytest-instrukcija-dlja-nachinajushhih) для проверки функциональности программы или ее частей.
-Рекомендуется использовать pytest. Также название тестов должно быть осмысленно и содержать определение проверямой части.
-Базовые соглашения pytest можно посмотреть [здесь](https://www.qabash.com/pytest-default-naming-conventions-guide/).
-Рекомендуется проверять не только успешные кейсы, но и краевые условия и кейсы в которых была допущена ошибка (неудачные кейсы).
-
-В качестве пакетного менджера в данном шаблоне/репозитории используется [uv](https://github.com/astral-sh/uv).
-Можно использовать и [стандартные виртальные окружения](https://docs.python.org/3/library/venv.html). В таком случае необходимо добавить в репозиторий `requirements.txt`.
-Это достигается командой
-```shell
-pip freeze > requirements.txt
+```text
+src/streamstats/
+├── __init__.py
+├── __main__.py      # CLI: вывод и команды
+├── models.py        # Event и проверка полей
+├── parsers.py       # парсеры CSV и JSONL
+├── analysis.py      # Analysis - статистика для вывода, ParseStats
+├── report.py        # build_report и save_report
+├── decorators.py    # перевод файловых ошибок в CliConfigurationError
+├── constants.py     # уровни
+└── errors.py        # StreamStatsError и его наследники
+tests/
+├── test_analysis.py
+├── test_cli.py
+├── test_csv_parser.py
+├── test_json_parser.py
+├── test_models.py
+└── test_report.py
+examples/
+└── events.jsonl
 ```
-Также разрешается использовать [`poetry`](https://python-poetry.org/)
-## Как работать с репозиторием и шаблонами
-1. Необходимо создать репозиторий из этого шаблона. Посмотреть можно [здесь](https://docs.github.com/ru/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template)
-2. Склонировать или спуллить его к себе на машину командами `git pull` или `git clone`
-3. Создать виртуальное окружение:
 
-    a. Для uv прописать команду `uv venv`. Затем прописать `.venv/bin/activate` в терминале
+**Обработка** выполняется по следующим шагам:
 
-    b. Для обычного python `python -m venv <имя директории где будет храниться папка .venv>`. Затем прописать `.venv/bin/activate` в терминале
-4. Установить [`pre-commit`](https://pre-commit.com/). Для этого достаточно ввести команду `pip install pre-commit`
-5. Выполнить команду `pre-commit install`
-6. При запушивании в репозиторий необходимо правильно составлять сообщения коммита. Правила можно прочитать [здесь](https://github.com/RomuloOliveira/commit-messages-guide/blob/master/README_ru-RU.md)
-7. **Внимательно** читайте то, что пишется при попытке коммита, если исправили ошибки нужно заново добавить отредактированные файлы в гит и попробовать коммитнуть
+1. **Парсер** - генератор, читает файл построчно и отдаёт по одному объекту `Event`.
+2. **Объединение файлов** - `_all_events` по каждому файлу.
+3. **Анализ** каждое событие передаётся в `Analysis.add`, которое увеличивает счётчики и обновляет timestamp'ы. Само событие после этого не хранится.
+4. **Отчёт** из `Analysis` собирается словарь, `save_report` записывает его в JSON.
+
+`readlines()` и `read()` не используются, список всех событий не создаётся.
+
+Все исключения наследуются от `StreamStatsError`
+
+CLI выводит только `StreamStatsError`, в формате сообщения с файлом и строкой, программа возвращает код `2`.
+
+## Принятые решения
+
+- часовой пояс в `timestamp` обязателен, иначе метки из разных файлов не получится сравнивать.
+- уровень зависит от регистра: `info` считается ошибкой `unsupported_level`.
+- лишние колонки CSV и ключи JSONL игнорируются
+- пустой `message` разрешён, пустой или из пробелов `source` - нет.
+- неверный заголовок CSV - ошибка файла, поэтому она не пропускается даже с `--skip-invalid`.
+- пустой файл даёт нулевой отчёт, в timestamp кладутся null
+- top-5 при равенстве сортируется по имени источника.
+- отчёт не может совпадать с входным файлом, исходные файлы никогда не изменяются.
+- номер строки в CSV считается с учётом заголовка
