@@ -14,6 +14,14 @@ from streamstats.models import Event
 logger = logging.getLogger(__name__)
 
 def _parse_line(line: str) -> Event:
+    """
+    Разбирает одну строку JSONL в Event
+
+    :param line: строка файла
+    :return: событие Event
+    :raises InvalidEventError: строка не является JSON объектом или событие невалидно
+    :raises InvalidTimestampError: невалидный timestamp
+    """
     try:
         json_line = json.loads(line)
     except json.JSONDecodeError as e:
@@ -28,6 +36,19 @@ def _parse_line(line: str) -> Event:
 
 
 def _handle_invalid(e, path, number, skip_invalid, stats) -> None:
+    """
+    Обрабатывает невалидную строку в зависимости от режима
+
+    Добавляет к ошибке путь и номер строки. Без skip_invalid пробрасывает ошибку дальше,
+    со skip_invalid пишет WARNING в лог и увеличивает счётчик пропущенных строк
+
+    :param e: ошибка валидации строки
+    :param path: путь к файлу
+    :param number: номер строки в файле
+    :param skip_invalid: режим --skip-invalid
+    :param stats: статистика разбора, может быть None
+    :raises StreamStatsError: та же ошибка e, если skip_invalid выключен
+    """
     e.path = path
     e.line = number
     if not skip_invalid:
@@ -38,6 +59,14 @@ def _handle_invalid(e, path, number, skip_invalid, stats) -> None:
 
 
 def _build_event(raw: dict) -> Event:
+    """
+    Создаёт Event из словаря с полями строки
+
+    :param raw: словарь из JSON объекта или строки CSV
+    :return: событие Event
+    :raises InvalidEventError: нет обязательного поля или событие невалидно
+    :raises InvalidTimestampError: невалидный timestamp
+    """
     try:
         timestamp = raw['timestamp']
         level = raw['level']
@@ -52,6 +81,17 @@ def _build_event(raw: dict) -> Event:
 
 @file_errors_generator
 def parse_jsonl(path: Path, skip_invalid: bool = False, parse_stats: ParseStats | None = None):
+    """
+    Построчно читает файл JSONL и отдаёт события по одному
+
+    :param path: путь к файлу
+    :param skip_invalid: пропускать невалидные строки с предупреждением в лог
+    :param parse_stats: статистика, в которую добавляется число пропущенных строк
+    :return: генератор событий Event
+    :raises InvalidEventError: невалидная строка без skip_invalid
+    :raises InvalidTimestampError: невалидный timestamp без skip_invalid
+    :raises CliConfigurationError: файл не найден, не UTF-8 или нет прав
+    """
     with open(path, 'r', encoding='utf-8') as file:
         for number, line in enumerate(file, start=1):
             try:
@@ -65,6 +105,20 @@ def parse_jsonl(path: Path, skip_invalid: bool = False, parse_stats: ParseStats 
 
 @file_errors_generator
 def parse_csv(path: Path, skip_invalid: bool = False, parse_stats: ParseStats | None = None):
+    """
+    Построчно читает файл CSV с заголовком и отдаёт события по одному
+
+    Номер строки считается с учётом заголовка. Неверный заголовок считается ошибкой всего файла,
+    она не пропускается даже со skip_invalid
+
+    :param path: путь к файлу
+    :param skip_invalid: пропускать невалидные строки с предупреждением в лог
+    :param parse_stats: статистика, в которую добавляется число пропущенных строк
+    :return: генератор событий Event
+    :raises InvalidEventError: неверный заголовок или невалидная строка без skip_invalid
+    :raises InvalidTimestampError: невалидный timestamp без skip_invalid
+    :raises CliConfigurationError: файл не найден, не UTF-8 или нет прав
+    """
     with open(path, 'r', newline='', encoding='utf-8') as file:
         reader = csv.DictReader(file)
 

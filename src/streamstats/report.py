@@ -6,6 +6,14 @@ from streamstats.decorators import file_errors
 
 
 def build_report(analysis: Analysis, parse_stats: ParseStats, top_n: int = 5) -> dict:
+    """
+    Собирает отчёт из статистики Analysis + ParseStats
+
+    :param analysis: статистика по событиям
+    :param parse_stats: статистика пропущенных строк
+    :param top_n: из сколько источников составить топ
+    :return: словарь отчёта, готовый к записи в JSON
+    """
     first_timestamp = None
     last_timestamp = None
 
@@ -30,5 +38,12 @@ def build_report(analysis: Analysis, parse_stats: ParseStats, top_n: int = 5) ->
 
 @file_errors
 def save_report(report: dict, path: Path):
+    """
+    Пишет отчёт в JSON файл в UTF-8
+
+    :param report: словарь отчёта из build_report
+    :param path: путь к файлу отчёта
+    :raises CliConfigurationError: директории не существует или нет прав на запись
+    """
     with open(path, "w", encoding="utf-8") as f:
         json.dump(report, f, ensure_ascii=False, indent=4, sort_keys=False)

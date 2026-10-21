@@ -20,11 +20,30 @@ PARSERS = {
 
 
 def _all_events(args, parser, parse_stats):
+    """
+    Последовательно читает все входные файлы
+
+    :param args: аргументы команды analyze, используются inputs и skip_invalid
+    :param parser: функция-парсер для выбранного формата из PARSERS
+    :param parse_stats: общая статистика пропущенных строк для всех файлов
+    :return: генератор событий Event из всех файлов по очереди
+    """
     for path in args.inputs:
         yield from parser(path, args.skip_invalid, parse_stats)
 
 
 def _analyze_func(args):
+    """
+    Выполняет команду analyze: проверяет аргументы, считает статистику и выводит отчёт
+
+    Если --output не указан, отчёт печатается в stdout
+
+    :param args: аргументы команды analyze
+    :raises UnsupportedFormatError: формат не поддерживается
+    :raises CliConfigurationError: файл отчёта совпадает с входным
+    :raises InvalidEventError: невалидная строка без --skip-invalid
+    :raises InvalidTimestampError: невалидный timestamp без --skip-invalid
+    """
     parser = PARSERS.get(args.format)
     if parser is None:
         raise UnsupportedFormatError(message=f"Неподдерживаемый формат: {args.format}",
@@ -48,6 +67,14 @@ def _analyze_func(args):
 
 
 def main(argv=None):
+    """
+    CLI, разбирает аргументы и запускает выбранную команду
+
+    Ошибки StreamStatsError выводятся в stderr. Остальные ошибки, не перехватываются
+
+    :param argv: аргументы команды. Если None - берутся из командной строки
+    :return: 0 при успехе, 2 при ошибке
+    """
     logging.basicConfig(level=logging.WARNING, format="%(levelname)s: %(message)s")
 
     parser = argparse.ArgumentParser(
