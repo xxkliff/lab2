@@ -15,3 +15,6 @@ dev = ["pytest", "pytest-cov", "ruff", "mypy"]
 [tool.pytest.ini_options]
 pythonpath = ["src"]
 testpaths = ["tests"]
+
+[tool.mypy]
+mypy_path = "src"

@@ -59,7 +59,7 @@ def test_cli_multiple_files(tmp_path: Path, capsys: pytest.CaptureFixture[str]) 
         path = tmp_path / f'test{i}.jsonl'
         paths.append(path)
         path.write_text(LINES, encoding='utf-8')
-        
+
     report_path = tmp_path / 'report.json'
     code = main(["analyze", *map(str, paths), "--format", "jsonl", "--output", str(report_path)])
     out, err = capsys.readouterr()
