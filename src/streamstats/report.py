@@ -1,11 +1,12 @@
 import json
 from pathlib import Path
+from typing import Any
 
 from streamstats.analysis import Analysis, ParseStats
 from streamstats.decorators import file_errors
 
 
-def build_report(analysis: Analysis, parse_stats: ParseStats, top_n: int = 5) -> dict:
+def build_report(analysis: Analysis, parse_stats: ParseStats, top_n: int = 5) -> dict[str, Any]:
     """
     Собирает отчёт из статистики Analysis + ParseStats
 
@@ -37,7 +38,7 @@ def build_report(analysis: Analysis, parse_stats: ParseStats, top_n: int = 5) ->
 
 
 @file_errors
-def save_report(report: dict, path: Path):
+def save_report(report: dict[str, Any], path: Path) -> None:
     """
     Пишет отчёт в JSON файл в UTF-8
 

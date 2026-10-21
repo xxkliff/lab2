@@ -2,6 +2,7 @@ import argparse
 import json
 import logging
 import sys
+from collections.abc import Callable, Iterator
 from pathlib import Path
 
 from streamstats.analysis import ParseStats, analyze
@@ -10,16 +11,17 @@ from streamstats.errors import (
     StreamStatsError,
     UnsupportedFormatError,
 )
+from streamstats.models import Event
 from streamstats.parsers import parse_csv, parse_jsonl
 from streamstats.report import build_report, save_report
 
-PARSERS = {
+PARSERS: dict[str, Callable] = {
     "csv": parse_csv,
     "jsonl": parse_jsonl,
 }
 
 
-def _all_events(args, parser, parse_stats):
+def _all_events(args: argparse.Namespace, parser: Callable, parse_stats: ParseStats) -> Iterator[Event]:
     """
     Последовательно читает все входные файлы
 
@@ -32,7 +34,7 @@ def _all_events(args, parser, parse_stats):
         yield from parser(path, args.skip_invalid, parse_stats)
 
 
-def _analyze_func(args):
+def _analyze_func(args: argparse.Namespace) -> None:
     """
     Выполняет команду analyze: проверяет аргументы, считает статистику и выводит отчёт
 
@@ -66,7 +68,7 @@ def _analyze_func(args):
         save_report(report, args.output)
 
 
-def main(argv=None):
+def main(argv: list[str] | None = None) -> int:
     """
     CLI, разбирает аргументы и запускает выбранную команду
 

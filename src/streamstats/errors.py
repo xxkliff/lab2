@@ -7,7 +7,7 @@ class StreamStatsError(Exception):
 
     Хранит код ошибки, сообщение и, если известно, путь к файлу и номер строки
     """
-    def __init__(self, error_code, message, path: Path | str = "", line: int | None = None):
+    def __init__(self, error_code: str, message: str, path: Path | str = "", line: int | None = None) -> None:
         """
         :param error_code: код ошибки для тестов и обработки
         :param message: сообщение для пользователя
@@ -20,11 +20,11 @@ class StreamStatsError(Exception):
         self.message = message
         self.error_code = error_code
 
-    def __str__(self):
+    def __str__(self) -> str:
         """
         :return: сообщение с номером строки и путём, если они известны
         """
-        parts = []
+        parts: list[str] = []
 
         if self.line is not None:
             parts.append(f"(строка {self.line})")

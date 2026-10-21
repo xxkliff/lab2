@@ -32,7 +32,7 @@ class Analysis:
     first_timestamp: datetime | None = None
     last_timestamp: datetime | None = None
 
-    def add(self, event: Event):
+    def add(self, event: Event) -> None:
         """
         Обновляет счётчики по одному событию
 

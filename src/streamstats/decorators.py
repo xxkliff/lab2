@@ -6,7 +6,7 @@ from pathlib import Path
 from streamstats.errors import CliConfigurationError
 
 
-def handle_file_exception(e: Exception, path: Path | str):
+def handle_file_exception(e: Exception, path: Path | str) -> None:
     """
     Переводит системную файловую ошибку в CliConfigurationError
 
@@ -29,7 +29,7 @@ def handle_file_exception(e: Exception, path: Path | str):
     raise e
 
 
-def _find_path(func: Callable, *args, **kwargs):
+def _find_path(func: Callable, *args: object, **kwargs: object) -> Path | str:
     """
     Находит path в вызове функции (по имени либо позиционно)
 

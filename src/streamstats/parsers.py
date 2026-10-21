@@ -1,6 +1,7 @@
 import csv
 import json
 import logging
+from collections.abc import Iterator
 from pathlib import Path
 
 from streamstats.analysis import ParseStats
@@ -8,6 +9,7 @@ from streamstats.decorators import file_errors_generator
 from streamstats.errors import (
     InvalidEventError,
     InvalidTimestampError,
+    StreamStatsError,
 )
 from streamstats.models import Event
 
@@ -35,7 +37,7 @@ def _parse_line(line: str) -> Event:
     return _build_event(json_line)
 
 
-def _handle_invalid(e, path, number, skip_invalid, stats) -> None:
+def _handle_invalid(e: StreamStatsError, path: Path, number: int, skip_invalid: bool, stats: ParseStats | None) -> None:
     """
     Обрабатывает невалидную строку в зависимости от режима
 
@@ -80,7 +82,7 @@ def _build_event(raw: dict) -> Event:
 
 
 @file_errors_generator
-def parse_jsonl(path: Path, skip_invalid: bool = False, parse_stats: ParseStats | None = None):
+def parse_jsonl(path: Path, skip_invalid: bool = False, parse_stats: ParseStats | None = None) -> Iterator[Event]:
     """
     Построчно читает файл JSONL и отдаёт события по одному
 
@@ -104,7 +106,7 @@ def parse_jsonl(path: Path, skip_invalid: bool = False, parse_stats: ParseStats 
 
 
 @file_errors_generator
-def parse_csv(path: Path, skip_invalid: bool = False, parse_stats: ParseStats | None = None):
+def parse_csv(path: Path, skip_invalid: bool = False, parse_stats: ParseStats | None = None) -> Iterator[Event]:
     """
     Построчно читает файл CSV с заголовком и отдаёт события по одному
 

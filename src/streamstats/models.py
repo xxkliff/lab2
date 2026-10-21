@@ -20,7 +20,7 @@ class Event:
     source: str
     message: str
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """
         Проверяет поля Event'а и переводит timestamp из строки в datetime
 
