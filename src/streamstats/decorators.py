@@ -2,11 +2,12 @@ import inspect
 from collections.abc import Callable
 from functools import wraps
 from pathlib import Path
+from typing import NoReturn
 
 from streamstats.errors import CliConfigurationError
 
 
-def handle_file_exception(e: Exception, path: Path | str) -> None:
+def handle_file_exception(e: Exception, path: Path | str) -> NoReturn:
     """
     Переводит системную файловую ошибку в CliConfigurationError
 
